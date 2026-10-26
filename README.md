@@ -37,6 +37,9 @@
 > - [`bundles/acme_retail/`](bundles/acme_retail/) — Acme Retail finance
 >   metrics with attested computations
 >   ([viz.html](bundles/acme_retail/viz.html))
+>
+> **Use OKF with other standards** — guides in [`usecases/`](usecases/)
+> show how OKF pairs with an existing standard. See [Use cases](#use-cases).
 
 ## Why OKF?
 
@@ -86,6 +89,37 @@ properties that are hard to get from a service-owned metadata store:
 The net effect is that reference agents, consumption agents, and humans
 collaborate on the same artifacts in the same way they already collaborate
 on source code.
+
+## Use cases
+
+OKF is deliberately minimal. It refers to domain standards such as Avro,
+Protobuf, or OpenAPI rather than absorbing them. When your organization
+already has an artifact in another standard — a schema, a contract, a
+semantic model — a use case shows what the OKF concept next to it should
+say, and how an agent should use the two together. Each one explains:
+
+- **Where the boundary sits:** what belongs in the other standard and what
+  belongs in OKF.
+- **How to link the two:** which frontmatter and link conventions point
+  from a concept into the other artifact.
+- **What an agent should do** with the combination.
+- **A complete worked example** you can copy.
+
+Use cases are layered on the core spec, not part of it. A bundle that
+ignores them is still a conformant OKF bundle. When a convention proves
+itself across several use cases, it can be proposed for the core spec.
+
+Each use case has its own folder under [`usecases/`](usecases/), named
+`usecases/<usecase>/`. The guide is a `.md` file in that folder, and any
+sample bundles or artifacts sit next to it.
+
+- [`usecases/ossie/`](usecases/ossie/) — linking concepts to an
+  [Apache Ossie](https://github.com/apache/ossie) semantic model, so an
+  agent asks for a metric and dimensions instead of writing a query.
+
+**Propose a use case.** If you pair OKF with a standard, open a pull
+request that adds a folder under `usecases/` with a `.md` file in it. A
+rough first draft is welcome; we'll refine it together in review.
 
 ## Install
 
