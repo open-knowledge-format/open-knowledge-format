@@ -29,4 +29,4 @@ SAFE_DIVIDE(
 )
 ```
 
-[^1]: Formulas sourced and derived from the `posts_questions` and `stackoverflow_posts` schema documented in [Database Schema Documentation](https://meta.stackexchange.com/questions/2677/database-schema-documentation-for-the-public-data-dump-and-sede).
+[^meta_schema_doc]: Formulas sourced and derived from the `posts_questions` and `stackoverflow_posts` schema documented in [Database Schema Documentation](https://meta.stackexchange.com/questions/2677/database-schema-documentation-for-the-public-data-dump-and-sede).

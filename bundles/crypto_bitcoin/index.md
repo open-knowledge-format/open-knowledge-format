@@ -1,3 +1,9 @@
+---
+okf_version: "0.3"
+title: Bitcoin blockchain (BigQuery public data)
+description: Blocks, transactions, inputs, and outputs of the Bitcoin blockchain in BigQuery, with join paths and metrics. Use it for questions about Bitcoin on-chain data.
+---
+
 # Subdirectories
 
 * [datasets](datasets/index.md) - A public Google BigQuery dataset containing the complete transaction ledger and block history of the Bitcoin blockchain.

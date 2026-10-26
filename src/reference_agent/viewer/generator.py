@@ -19,6 +19,7 @@ import re
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
+from urllib.parse import unquote
 
 from reference_agent.bundle.document import (
     OKFDocument,
@@ -29,6 +30,7 @@ from reference_agent.bundle.document import (
 )
 
 _INDEX_NAME = "index.md"
+_LOG_NAME = "log.md"
 _LINK_RE = re.compile(r"\]\(([^)\s]+\.md)(?:#[A-Za-z0-9_\-]*)?\)")
 _TYPE_PALETTE = {
     "BigQuery Dataset": "#8b5cf6",
@@ -80,15 +82,21 @@ class Concept:
 
 
 def _extract_links(body: str, doc_dir: Path, bundle_root: Path) -> list[str]:
+    """Concept ids that the body links to (OKF v0.3 §6).
+
+    A target that starts with `/` resolves from the bundle root. Other
+    targets resolve from the directory of the linking file.
+    """
     out: list[str] = []
     seen: set[str] = set()
     bundle_root_resolved = bundle_root.resolve()
     for m in _LINK_RE.finditer(body):
-        target = m.group(1)
-        if "://" in target or target.startswith("/"):
+        target = unquote(m.group(1))
+        if "://" in target:
             continue
+        base = bundle_root if target.startswith("/") else doc_dir
         try:
-            resolved = (doc_dir / target).resolve().relative_to(bundle_root_resolved)
+            resolved = (base / target.lstrip("/")).resolve().relative_to(bundle_root_resolved)
         except ValueError:
             continue
         rel = resolved.as_posix()
@@ -103,7 +111,8 @@ def _extract_links(body: str, doc_dir: Path, bundle_root: Path) -> list[str]:
 def _walk_concepts(bundle_root: Path) -> list[Concept]:
     concepts: list[Concept] = []
     for md_path in sorted(bundle_root.rglob("*.md")):
-        if md_path.name == _INDEX_NAME:
+        # Reserved files are not concepts (OKF v0.3 §3.1).
+        if md_path.name in (_INDEX_NAME, _LOG_NAME):
             continue
         rel = md_path.relative_to(bundle_root).with_suffix("")
         concept_id = "/".join(rel.parts)

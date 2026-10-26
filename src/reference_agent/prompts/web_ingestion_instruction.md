@@ -97,7 +97,9 @@ minimum `type`. Strongly include `title` and `description` (one sentence; used
 in `index.md`). Leave `generated` unset; the tool fills
 `generated: {by: reference_agent/<model>, at: <now>}`. Record provenance in the
 `sources` frontmatter list (each entry `{id, resource, title}`), never in a
-`# Citations` body section. For reference docs:
+`# Citations` body section. To attribute a claim in the body, use a markdown
+footnote whose label is the `id` of a `sources` entry (e.g. `[^meta_schema_doc]`),
+never a numbered label like `[^1]`. For reference docs:
 
 - `type`: `Reference`
 - `resource`: the canonical source URL (the page you ingested)

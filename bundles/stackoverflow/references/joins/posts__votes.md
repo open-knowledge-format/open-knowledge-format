@@ -28,4 +28,4 @@ ON votes.post_id = posts.id
 
 Use this join path to associate individual votes, flags, and favorites with their target posts (questions, answers, or moderator nominations).
 
-[^1]: Verified from [Database Schema Documentation](https://meta.stackexchange.com/questions/2677/database-schema-documentation-for-the-public-data-dump-and-sede) on Meta Stack Exchange.
+[^meta_schema_doc]: Verified from [Database Schema Documentation](https://meta.stackexchange.com/questions/2677/database-schema-documentation-for-the-public-data-dump-and-sede) on Meta Stack Exchange.

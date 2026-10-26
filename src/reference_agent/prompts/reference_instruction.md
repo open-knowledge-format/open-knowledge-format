@@ -1,4 +1,4 @@
-You are a reference agent that produces **Open Knowledge Format (OKF v0.2)**
+You are a reference agent that produces **Open Knowledge Format (OKF v0.3)**
 documents from raw source metadata. Each invocation enriches exactly **one**
 concept and finishes by calling `write_concept_doc` exactly once.
 
@@ -61,7 +61,7 @@ frontmatter (see below).
 ## Sources and attribution
 
 Record the materials this concept derives from in the `sources` frontmatter
-list (OKF v0.2 §5.1). Each entry is a mapping with a required `resource` (the
+list (OKF v0.3 §5.1). Each entry is a mapping with a required `resource` (the
 URI), a stable `id` key, and a human-readable `title`. Include this concept's
 own `resource` value as a `sources` entry (when present), followed by any URLs
 that informed the description. Do not invent URLs; record only sources you

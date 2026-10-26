@@ -14,16 +14,35 @@
 
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from datetime import date, datetime, timezone
 from typing import Any
 
 import yaml
 
-# OKF v0.2 §11: `type` is the only always-required frontmatter key.
+# OKF v0.3 §4.1: `type` is the only always-required frontmatter key.
 REQUIRED_FRONTMATTER_KEYS = ("type",)
 
 _FRONTMATTER_DELIM = "---"
+
+_TIMESTAMP_TAG = "tag:yaml.org,2002:timestamp"
+_TIMESTAMP_RE = next(
+    regexp
+    for resolvers in yaml.SafeLoader.yaml_implicit_resolvers.values()
+    for tag, regexp in resolvers
+    if tag == _TIMESTAMP_TAG
+)
+_RESOLVERS_WITHOUT_TIMESTAMP = {
+    ch: [(tag, regexp) for tag, regexp in resolvers if tag != _TIMESTAMP_TAG]
+    for ch, resolvers in yaml.SafeLoader.yaml_implicit_resolvers.items()
+}
+
+# OKF v0.3 §5: the two RFC 3339 forms of a timestamp.
+_FULL_DATE_RE = re.compile(r"\d{4}-\d{2}-\d{2}")
+_DATE_TIME_RE = re.compile(
+    r"\d{4}-\d{2}-\d{2}[Tt]\d{2}:\d{2}:\d{2}(\.\d+)?([Zz]|[+-]\d{2}:\d{2})"
+)
 
 
 class _Loader(yaml.SafeLoader):
@@ -37,10 +56,48 @@ class _Loader(yaml.SafeLoader):
     """
 
 
-_Loader.yaml_implicit_resolvers = {
-    ch: [(tag, regexp) for tag, regexp in resolvers if tag != "tag:yaml.org,2002:timestamp"]
-    for ch, resolvers in yaml.SafeLoader.yaml_implicit_resolvers.items()
-}
+_Loader.yaml_implicit_resolvers = _RESOLVERS_WITHOUT_TIMESTAMP
+
+
+class _Dumper(yaml.SafeDumper):
+    """SafeDumper that writes a timestamp-like string the way the file had it.
+
+    SafeDumper quotes every string that looks like a timestamp, so rewriting
+    `at: 2026-06-30T14:00:00Z` gives `at: '2026-06-30T14:00:00Z'`: a
+    quote-only diff. Values in `plain_timestamps` stay plain; the rest are
+    quoted. Both forms read back as the same string.
+    """
+
+    plain_timestamps: frozenset[str] = frozenset()
+
+
+_Dumper.yaml_implicit_resolvers = _RESOLVERS_WITHOUT_TIMESTAMP
+
+
+def _represent_str(dumper: _Dumper, value: str) -> yaml.ScalarNode:
+    style = None
+    if _TIMESTAMP_RE.match(value) and value not in dumper.plain_timestamps:
+        style = "'"
+    return dumper.represent_scalar("tag:yaml.org,2002:str", value, style=style)
+
+
+_Dumper.add_representer(str, _represent_str)
+
+
+def _find_plain_timestamps(node: yaml.Node | None) -> set[str]:
+    """Timestamp-like scalars that the YAML wrote without quotes."""
+    if isinstance(node, yaml.ScalarNode):
+        if node.style is None and _TIMESTAMP_RE.match(node.value):
+            return {node.value}
+        return set()
+    found: set[str] = set()
+    if isinstance(node, yaml.SequenceNode):
+        for item in node.value:
+            found |= _find_plain_timestamps(item)
+    elif isinstance(node, yaml.MappingNode):
+        for key, value in node.value:
+            found |= _find_plain_timestamps(key) | _find_plain_timestamps(value)
+    return found
 
 
 class OKFDocumentError(ValueError):
@@ -51,9 +108,17 @@ class OKFDocumentError(ValueError):
 class OKFDocument:
     frontmatter: dict[str, Any] = field(default_factory=dict)
     body: str = ""
+    # Timestamp-like values that the source file wrote without quotes.
+    # `serialize` keeps them plain so a rewrite does not change their quoting.
+    plain_timestamps: frozenset[str] = field(
+        default_factory=frozenset, compare=False, repr=False
+    )
 
     @classmethod
     def parse(cls, text: str) -> "OKFDocument":
+        # Some editors write a UTF-8 BOM. Drop it so that the opening `---`
+        # is found. `splitlines` already treats CRLF and LF the same.
+        text = text.removeprefix("\ufeff")
         lines = text.splitlines()
         if not lines or lines[0].strip() != _FRONTMATTER_DELIM:
             return cls(frontmatter={}, body=text)
@@ -69,6 +134,7 @@ class OKFDocument:
         fm_text = "\n".join(lines[1:end_idx])
         try:
             fm = yaml.load(fm_text, Loader=_Loader) or {}
+            plain = _find_plain_timestamps(yaml.compose(fm_text, Loader=_Loader))
         except yaml.YAMLError as e:
             raise OKFDocumentError(f"Invalid YAML in frontmatter: {e}") from e
         if not isinstance(fm, dict):
@@ -77,11 +143,12 @@ class OKFDocument:
         body = "\n".join(lines[end_idx + 1:])
         if body.startswith("\n"):
             body = body[1:]
-        return cls(frontmatter=fm, body=body)
+        return cls(frontmatter=fm, body=body, plain_timestamps=frozenset(plain))
 
     def serialize(self) -> str:
-        fm_text = yaml.safe_dump(
-            self.frontmatter, sort_keys=False, allow_unicode=True
+        dumper = type("_DocDumper", (_Dumper,), {"plain_timestamps": self.plain_timestamps})
+        fm_text = yaml.dump(
+            self.frontmatter, Dumper=dumper, sort_keys=False, allow_unicode=True
         ).rstrip()
         body = self.body if self.body.endswith("\n") else self.body + "\n"
         return f"{_FRONTMATTER_DELIM}\n{fm_text}\n{_FRONTMATTER_DELIM}\n\n{body}"
@@ -95,7 +162,7 @@ class OKFDocument:
 
 
 def normalize_verified(frontmatter: dict[str, Any]) -> list[dict[str, Any]]:
-    """Return the `verified` events as a list (OKF v0.2 §5.2).
+    """Return the `verified` events as a list (OKF v0.3 §5.2).
 
     A single verifier MAY be written as one `{ by, at }` mapping without the
     list dash; consumers MUST treat a bare mapping as a one-element list.
@@ -110,14 +177,36 @@ def normalize_verified(frontmatter: dict[str, Any]) -> list[dict[str, Any]]:
     return []
 
 
-def trust_tier(frontmatter: dict[str, Any]) -> str:
-    """Derive a concept's trust tier from `verified` (OKF v0.2 §5.3).
+def _current_events(frontmatter: dict[str, Any]) -> list[dict[str, Any]]:
+    """The verification events that are current (OKF v0.3 §5.3).
 
-    - No `verified` key ⇒ "unverified".
-    - `verified` by non-`human:` actors only ⇒ "machine-confirmed".
-    - `verified` by a `human:<id>` actor ⇒ "human-reviewed".
+    An event is current when its `at` is at or after `generated.at`, or when
+    `generated` is absent. Events without both `by` and `at` are ignored. When
+    either timestamp cannot be parsed, the event is not current.
     """
-    events = normalize_verified(frontmatter)
+    events = [e for e in normalize_verified(frontmatter) if e.get("by") and e.get("at")]
+    generated = frontmatter.get("generated")
+    if not isinstance(generated, dict) or not generated.get("at"):
+        return events
+    generated_at = parse_timestamp(generated["at"])
+    if generated_at is None:
+        return []
+    current = []
+    for event in events:
+        at = parse_timestamp(event["at"])
+        if at is not None and at >= generated_at:
+            current.append(event)
+    return current
+
+
+def trust_tier(frontmatter: dict[str, Any]) -> str:
+    """Derive a concept's trust tier from current `verified` events (OKF v0.3 §5.3).
+
+    - No current event ⇒ "unverified".
+    - Current events from non-`human:` actors only ⇒ "machine-confirmed".
+    - A current event from a `human:<id>` actor ⇒ "human-reviewed".
+    """
+    events = _current_events(frontmatter)
     if not events:
         return "unverified"
     for event in events:
@@ -127,21 +216,42 @@ def trust_tier(frontmatter: dict[str, Any]) -> str:
     return "machine-confirmed"
 
 
-def is_stale(frontmatter: dict[str, Any], now: datetime | None = None) -> bool:
-    """Whether a concept is stale per `stale_after` (OKF v0.2 §5.5).
+def parse_timestamp(value: Any) -> datetime | None:
+    """Parse an OKF timestamp (OKF v0.3 §5), or return None if it is malformed.
 
-    A concept is stale when `now >= stale_after`. Returns False when
-    `stale_after` is absent, or is not an ISO 8601 datetime with an explicit
-    UTC offset: a date-only `2026-12-31` names a different instant in every
-    timezone, so it is ignored rather than guessed at.
+    A value is an RFC 3339 date-time with an offset, or a date only, which
+    means the start of that day in UTC. Quoted strings and YAML-native
+    `date`/`datetime` values are both accepted. A date-time without an
+    offset is malformed.
     """
-    raw = str(frontmatter.get("stale_after") or "")
-    if "T" not in raw:
-        return False
+    if isinstance(value, datetime):
+        return value if value.tzinfo is not None else None
+    if isinstance(value, date):
+        return datetime(value.year, value.month, value.day, tzinfo=timezone.utc)
+    if not isinstance(value, str):
+        return None
     try:
-        stale_after = datetime.fromisoformat(raw)
+        if _FULL_DATE_RE.fullmatch(value):
+            d = date.fromisoformat(value)
+            return datetime(d.year, d.month, d.day, tzinfo=timezone.utc)
+        if _DATE_TIME_RE.fullmatch(value):
+            return datetime.fromisoformat(value.upper().replace("Z", "+00:00"))
     except ValueError:
+        return None
+    return None
+
+
+def is_stale(frontmatter: dict[str, Any], now: datetime | None = None) -> bool:
+    """Whether a concept is stale per `stale_after` (OKF v0.3 §5.5).
+
+    A concept is stale when `now >= stale_after`. An absent, null, or empty
+    `stale_after` is never stale. A value that does not parse is treated as
+    stale, because a consumer MUST NOT treat it as fresh.
+    """
+    raw = frontmatter.get("stale_after")
+    if raw is None or raw == "":
         return False
-    if stale_after.tzinfo is None:
-        return False
+    stale_after = parse_timestamp(raw)
+    if stale_after is None:
+        return True
     return (now or datetime.now(timezone.utc)) >= stale_after

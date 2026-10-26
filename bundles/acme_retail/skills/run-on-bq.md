@@ -39,4 +39,4 @@ The `executor.resource` field of an `Attested Computation` points here when the 
 
 ## Post-conditions
 
-The receipt is handed to the concept's `attester.resource`. Do not display the value to the user until the attester returns `verdict: ok`.
+The receipt is handed to the concept's `attester.resource`. Do not display the value to the user until the attester returns `ok: true`.

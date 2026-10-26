@@ -148,6 +148,40 @@ def test_cross_links_become_edges(tmp_path: Path):
     assert ("tables/events", "tables/users") in pairs
 
 
+def test_bundle_root_links_become_edges(tmp_path: Path):
+    bundle = tmp_path / "bundle"
+    _make_bundle(bundle)
+    _write(
+        bundle / "references" / "metrics" / "wau.md",
+        """
+        ---
+        type: Reference
+        title: Weekly active users
+        ---
+        Rolls up [DAU](dau.md) over [users](/tables/users.md#columns) and
+        [events](/tables/../tables/events.md).
+        """,
+    )
+    out = tmp_path / "viz.html"
+    generate_visualization(bundle, out)
+    data = _extract_bundle_data(out.read_text(encoding="utf-8"))
+    pairs = {(e["data"]["source"], e["data"]["target"]) for e in data["edges"]}
+    assert ("references/metrics/wau", "references/metrics/dau") in pairs
+    assert ("references/metrics/wau", "tables/users") in pairs
+    assert ("references/metrics/wau", "tables/events") in pairs
+
+
+def test_log_md_is_not_a_concept(tmp_path: Path):
+    bundle = tmp_path / "bundle"
+    _make_bundle(bundle)
+    # Even with frontmatter that has `type`, a reserved file is not a concept.
+    _write(bundle / "log.md", "---\ntype: Log\n---\n# History\n\n## 2026-05-28\n- Created.\n")
+    out = tmp_path / "viz.html"
+    generate_visualization(bundle, out)
+    data = _extract_bundle_data(out.read_text(encoding="utf-8"))
+    assert "log" not in {n["data"]["id"] for n in data["nodes"]}
+
+
 def test_missing_link_targets_are_skipped(tmp_path: Path):
     bundle = tmp_path / "bundle"
     _write(
@@ -181,7 +215,7 @@ def test_node_colors_match_palette(tmp_path: Path):
     assert by_id["references/metrics/dau"]["color"] == "#10b981"
 
 
-def test_v02_signals_appear_in_graph_payload(tmp_path: Path):
+def test_trust_signals_appear_in_graph_payload(tmp_path: Path):
     bundle = tmp_path / "bundle"
     _make_bundle(bundle)
     out = tmp_path / "viz.html"

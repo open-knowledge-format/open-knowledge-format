@@ -1,6 +1,6 @@
 # Open Knowledge Format (OKF)
 
-### 📖 [Read the Open Knowledge Format v0.2 specification → SPEC.md](SPEC.md)
+### 📖 [Read the Open Knowledge Format v0.3 specification → SPEC.md](SPEC.md)
 
 > **This repository is primarily about the [Open Knowledge Format
 > (OKF)](SPEC.md).**
@@ -24,8 +24,9 @@
 > contribution; this agent and the visualizer exist to make the format
 > tangible at both ends — production and consumption.
 >
-> **See OKF in practice** — three ready-to-browse bundles produced by this
-> agent, checked into [`bundles/`](bundles/):
+> **See OKF in practice** — ready-to-browse bundles checked into
+> [`bundles/`](bundles/). The first three were produced by this agent; Acme
+> Retail is hand-written and shows attested computations:
 >
 > - [`bundles/ga4/`](bundles/ga4/) — GA4 e-commerce dataset
 >   ([viz.html](bundles/ga4/viz.html))
@@ -33,7 +34,8 @@
 >   public dataset ([viz.html](bundles/stackoverflow/viz.html))
 > - [`bundles/crypto_bitcoin/`](bundles/crypto_bitcoin/) — Bitcoin
 >   blocks/transactions ([viz.html](bundles/crypto_bitcoin/viz.html))
-> - [`bundles/acme_retail/`](bundles/acme_retail/) — Acme Retail
+> - [`bundles/acme_retail/`](bundles/acme_retail/) — Acme Retail finance
+>   metrics with attested computations
 >   ([viz.html](bundles/acme_retail/viz.html))
 
 ## Why OKF?
@@ -56,12 +58,16 @@ properties that are hard to get from a service-owned metadata store:
   for the few fields you want to query, filter, or index on (`type`,
   `resource`, `tags`, `generated`, `status`); use the markdown body for the
   prose, schemas, and example queries that LLMs and humans actually read.
-- **Trust, provenance, and freshness are first-class.** v0.2 puts queryable
+- **Trust, provenance, and freshness are first-class.** OKF puts queryable
   signals in frontmatter — where a concept came from (`sources` with per-source
   credibility signals), who produced and confirmed it (`generated`, `verified`,
   from which consumers derive a trust tier), and whether it is still current
   (`status`, `stale_after`) — so an agent-maintained corpus stays trustable
   without any bespoke runtime.
+- **Numbers can be attested.** An `Attested Computation` concept carries the
+  sanctioned computation, its typed parameters, and a deterministic attester,
+  so a consumer can check that an agent ran the approved query rather than
+  one it wrote itself.
 - **Minimally opinionated, freely extensible.** A small set of required
   keys ensures interoperability, but bundles can carry arbitrary extra
   frontmatter keys and arbitrary body sections without breaking
@@ -174,8 +180,8 @@ one shape.
   edges drawn from each cross-link in the markdown bodies.
 - A **detail panel** for the selected concept showing its frontmatter
   (description, resource link, tags) and its rendered markdown body —
-  with internal `[…](/path/to/concept.md)` links rewired to navigate
-  within the viewer instead of following the path.
+  with internal links (relative, or `/`-rooted at the bundle root) rewired
+  to navigate within the viewer instead of following the path.
 - A **"Cited by" backlinks** list under each concept (computed from the
   reverse of the link graph).
 - A **search box** (matches title, concept id, and tags), a **type

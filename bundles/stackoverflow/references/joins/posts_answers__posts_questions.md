@@ -29,4 +29,4 @@ ON posts_answers.parent_id = posts_questions.id
 
 Use this join path to correlate answers directly back to their parent questions to aggregate answer counts, verify metrics like Accepted Answer rate, or compare question/answer scores.
 
-[^1]: Verified from [Database Schema Documentation](https://meta.stackexchange.com/questions/2677/database-schema-documentation-for-the-public-data-dump-and-sede) on Meta Stack Exchange.
+[^meta_schema_doc]: Verified from [Database Schema Documentation](https://meta.stackexchange.com/questions/2677/database-schema-documentation-for-the-public-data-dump-and-sede) on Meta Stack Exchange.

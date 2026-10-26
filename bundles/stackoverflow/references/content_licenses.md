@@ -29,4 +29,4 @@ Lookup table defining Stack Overflow user content licensing over time based on t
 | **CC BY-SA 3.0** | 2011-04-08 | 2018-05-01 | [Creative Commons BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0/) |
 | **CC BY-SA 2.5** | *inception* | 2011-04-07 | [Creative Commons BY-SA 2.5](https://creativecommons.org/licenses/by-sa/2.5/) |
 
-[^1]: Verified from [Database Schema Documentation](https://meta.stackexchange.com/questions/2677/database-schema-documentation-for-the-public-data-dump-and-sede) on Meta Stack Exchange.
+[^meta_schema_doc]: Verified from [Database Schema Documentation](https://meta.stackexchange.com/questions/2677/database-schema-documentation-for-the-public-data-dump-and-sede) on Meta Stack Exchange.

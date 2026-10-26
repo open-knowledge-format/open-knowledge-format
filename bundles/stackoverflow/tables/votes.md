@@ -18,14 +18,14 @@ sources:
 
 This table contains all individual votes cast on posts within the Stack Overflow community. Each row represents a single vote, linking it to the specific post and capturing the type of vote and when it occurred. The `vote_type_id` column can be joined with a dimension table to decode the meaning of the vote (e.g., upvote, downvote, favorite).
 
-For a detailed catalog of the `vote_type_id` column values, see the [Vote Types Reference](../references/vote_types.md). [^1]
+For a detailed catalog of the `vote_type_id` column values, see the [Vote Types Reference](../references/vote_types.md). [^meta_schema_doc]
 
 # Schema
 
 *   `id`: Unique identifier for the vote.
-*   `creation_date`: The date and time when the vote was cast. (Note: Time information is truncated to `00:00:00` for privacy). [^1]
+*   `creation_date`: The date and time when the vote was cast. (Note: Time information is truncated to `00:00:00` for privacy). [^meta_schema_doc]
 *   `post_id`: The identifier of the post that received the vote. This can be joined with the `id` column in tables such as [posts_questions](posts_questions.md) or [posts_answers](posts_answers.md) to get details about the voted post.
-*   `vote_type_id`: The type of vote cast (e.g., upvote, downvote, favorite). See [Vote Types Reference](../references/vote_types.md). [^1]
+*   `vote_type_id`: The type of vote cast (e.g., upvote, downvote, favorite). See [Vote Types Reference](../references/vote_types.md). [^meta_schema_doc]
 
 # Common query patterns
 
@@ -69,10 +69,10 @@ SELECT
 
 # Metrics
 
-- [Bad Question Flag Ratio](../references/metrics/bad_question_flag_ratio.md) — Calculates the ratio of spam and offensive flags on questions. [^1]
+- [Bad Question Flag Ratio](../references/metrics/bad_question_flag_ratio.md) — Calculates the ratio of spam and offensive flags on questions. [^meta_schema_doc]
 
 # Joins
 
-- [posts](../references/joins/posts__votes.md) — join on `post_id` ↔ `id` to associate vote actions with questions, answers, and other post types. [^1]
+- [posts](../references/joins/posts__votes.md) — join on `post_id` ↔ `id` to associate vote actions with questions, answers, and other post types. [^meta_schema_doc]
 
-[^1]: Sourced from [Database Schema Documentation](https://meta.stackexchange.com/questions/2677/database-schema-documentation-for-the-public-data-dump-and-sede) on Meta Stack Exchange.
+[^meta_schema_doc]: Sourced from [Database Schema Documentation](https://meta.stackexchange.com/questions/2677/database-schema-documentation-for-the-public-data-dump-and-sede) on Meta Stack Exchange.

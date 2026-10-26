@@ -208,7 +208,7 @@
       tagsEl.textContent = "—";
     }
 
-    // v0.2 signal badges: status, trust tier, staleness.
+    // OKF signal badges: status, trust tier, staleness.
     const badgesEl = document.getElementById("detail-badges");
     badgesEl.innerHTML = "";
     const status = data.status || "stable";
@@ -263,7 +263,7 @@
     const html = marked.parse(body, { breaks: false, gfm: true });
     const bodyEl = document.getElementById("detail-body");
     bodyEl.innerHTML = html;
-    rewriteInternalLinks(bodyEl);
+    rewriteInternalLinks(bodyEl, conceptId);
 
     const bl = backlinks[conceptId] || [];
     const blSection = document.getElementById("detail-backlinks");
@@ -303,21 +303,42 @@
     return event.at ? `${event.by} · ${event.at}` : String(event.by);
   }
 
-  function rewriteInternalLinks(root) {
+  // Resolve a link target to a concept id (OKF v0.3 §6): a leading "/" is the
+  // bundle root; any other target is relative to the linking concept.
+  function resolveTarget(href, fromId) {
+    let path = href.split("#")[0];
+    if (!path.endsWith(".md") || /^[a-z][a-z0-9+.-]*:/i.test(path)) return null;
+    try {
+      path = decodeURIComponent(path);
+    } catch (e) {
+      return null;
+    }
+    const parts = path.startsWith("/") ? [] : fromId.split("/").slice(0, -1);
+    for (const seg of path.split("/")) {
+      if (seg === "" || seg === ".") continue;
+      if (seg === "..") {
+        if (!parts.length) return null;
+        parts.pop();
+      } else {
+        parts.push(seg);
+      }
+    }
+    return parts.join("/").slice(0, -3);
+  }
+
+  function rewriteInternalLinks(root, fromId) {
     root.querySelectorAll("a[href]").forEach((a) => {
       const href = a.getAttribute("href");
       if (!href) return;
-      if (href.startsWith("/") && href.endsWith(".md")) {
-        const target = href.slice(1, -3);
-        if (nodeIndex[target]) {
-          a.className = "internal";
-          a.setAttribute("href", "javascript:void(0)");
-          a.addEventListener("click", (e) => {
-            e.preventDefault();
-            showDetail(target);
-          });
-          return;
-        }
+      const target = resolveTarget(href, fromId);
+      if (target && nodeIndex[target]) {
+        a.className = "internal";
+        a.setAttribute("href", "javascript:void(0)");
+        a.addEventListener("click", (e) => {
+          e.preventDefault();
+          showDetail(target);
+        });
+        return;
       }
       a.className = "external";
       a.setAttribute("target", "_blank");

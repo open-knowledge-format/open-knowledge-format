@@ -30,4 +30,4 @@ SAFE_DIVIDE(
 )
 ```
 
-[^1]: Formulas sourced and derived from the `VoteTypeId` categories (4 = Offensive, 12 = Spam) documented in [Database Schema Documentation](https://meta.stackexchange.com/questions/2677/database-schema-documentation-for-the-public-data-dump-and-sede).
+[^meta_schema_doc]: Formulas sourced and derived from the `VoteTypeId` categories (4 = Offensive, 12 = Spam) documented in [Database Schema Documentation](https://meta.stackexchange.com/questions/2677/database-schema-documentation-for-the-public-data-dump-and-sede).

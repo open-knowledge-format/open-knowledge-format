@@ -106,3 +106,26 @@ def test_regenerate_single_child_reuses_description(tmp_path: Path):
     root_index = (root / "index.md").read_text(encoding="utf-8")
     assert "(datasets/index.md) - The only dataset in this bundle." in root_index
     assert call_count == 0
+
+
+def test_regenerate_adds_okf_version_to_new_root_index(tmp_path: Path):
+    root = tmp_path / "bundle"
+    _write_doc(root / "tables" / "users.md", "BigQuery Table", "users", "Per-user dimension.")
+
+    regenerate_indexes(root, model="stub", synthesize=_stub_synth)
+
+    root_index = (root / "index.md").read_text(encoding="utf-8")
+    assert root_index.startswith('---\nokf_version: "0.3"\n---\n\n# Subdirectories')
+
+
+def test_regenerate_keeps_root_index_frontmatter(tmp_path: Path):
+    root = tmp_path / "bundle"
+    _write_doc(root / "tables" / "users.md", "BigQuery Table", "users", "Per-user dimension.")
+    frontmatter = '---\nokf_version: "0.3"\ntitle: My bundle\nx-acme-owner: data-team\n---\n'
+    (root / "index.md").write_text(frontmatter + "\n# Old listing\n", encoding="utf-8")
+
+    regenerate_indexes(root, model="stub", synthesize=_stub_synth)
+
+    root_index = (root / "index.md").read_text(encoding="utf-8")
+    assert root_index.startswith(frontmatter + "\n# Subdirectories")
+    assert "# Old listing" not in root_index

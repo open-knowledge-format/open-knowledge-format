@@ -28,4 +28,4 @@ ON post_links.post_id = posts.id
 
 Use this join path to resolve metadata for the source post (`post_id`) or targets (`related_post_id`) in a link/duplicate relationship.
 
-[^1]: Verified from [Database Schema Documentation](https://meta.stackexchange.com/questions/2677/database-schema-documentation-for-the-public-data-dump-and-sede) on Meta Stack Exchange.
+[^meta_schema_doc]: Verified from [Database Schema Documentation](https://meta.stackexchange.com/questions/2677/database-schema-documentation-for-the-public-data-dump-and-sede) on Meta Stack Exchange.

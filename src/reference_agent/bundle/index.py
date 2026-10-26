@@ -23,6 +23,7 @@ from reference_agent.bundle.synthesizer import synthesize_description
 
 _INDEX_FILE = "index.md"
 _FALLBACK_MODEL = "gemini-flash-latest"
+_OKF_VERSION = "0.3"
 
 
 def _load_doc(path: Path) -> OKFDocument | None:
@@ -46,6 +47,21 @@ def _build_index_text(entries: list[tuple[str, str, str, str]]) -> str:
             lines.append(f"* [{title}]({link}){suffix}")
         sections.append("\n".join(lines))
     return "\n\n".join(sections) + "\n"
+
+
+def _root_frontmatter(index_path: Path) -> str:
+    """The frontmatter block for the bundle-root `index.md` (OKF v0.3 §8.1).
+
+    An existing block is kept verbatim, so that a regeneration does not drop
+    or re-serialize the bundle metadata. A new bundle gets `okf_version`.
+    """
+    if index_path.exists():
+        lines = index_path.read_text(encoding="utf-8").removeprefix("\ufeff").splitlines()
+        if lines and lines[0].strip() == "---":
+            for i in range(1, len(lines)):
+                if lines[i].strip() == "---":
+                    return "\n".join(lines[: i + 1]) + "\n\n"
+    return f'---\nokf_version: "{_OKF_VERSION}"\n---\n\n'
 
 
 def _directories_to_index(bundle_root: Path) -> list[Path]:
@@ -101,7 +117,10 @@ def regenerate_indexes(
             continue
 
         index_path = directory / _INDEX_FILE
-        index_path.write_text(_build_index_text(entries), encoding="utf-8")
+        text = _build_index_text(entries)
+        if directory == bundle_root:
+            text = _root_frontmatter(index_path) + text
+        index_path.write_text(text, encoding="utf-8")
         written.append(index_path)
 
         if directory == bundle_root:

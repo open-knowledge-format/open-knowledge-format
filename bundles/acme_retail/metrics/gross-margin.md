@@ -8,18 +8,18 @@ verified:
   - { by: human:jsmith@acme, at: 2026-07-01T09:00:00Z }
 status: stable
 stale_after: 2026-12-31T00:00:00Z
-not:
+x-acme-not:
   - term: "revenue minus product cost only"
     why: "that is the pre-FY2026 definition (see gross-margin-legacy). It excluded fulfillment, shipping, and payment fees, and could not be reconciled to the general ledger."
     instead: "revenue minus full COGS (product cost + inbound fulfillment + outbound shipping + payment fees)"
 sources:
   - id: margin-standard
-    resource: policies/margin-standard.md
+    resource: /policies/margin-standard.md
     title: Cost Allocation & Margin Standard (FY2026)
     author: human:jsmith@acme
     last_modified: 2026-06-15T00:00:00Z
   - id: revenue-policy
-    resource: policies/revenue-recognition.md
+    resource: /policies/revenue-recognition.md
     title: Revenue Recognition Policy (FY2026)
     author: human:jsmith@acme
     last_modified: 2026-06-15T00:00:00Z
@@ -29,7 +29,7 @@ sources:
 
 **Not:** revenue minus product cost only (that was the pre-2026 formula; see [`gross-margin-legacy`](./gross-margin-legacy.md)).
 
-Gross margin for a period equals recognized [Revenue](./revenue.md) minus **full COGS**, where full COGS is the sum of product cost, inbound fulfillment cost, outbound shipping cost, and payment processing fees. [^margin-standard]
+Gross margin for a period equals recognized [Revenue](./revenue.md)[^revenue-policy] minus **full COGS**, where full COGS is the sum of product cost, inbound fulfillment cost, outbound shipping cost, and payment processing fees. [^margin-standard]
 
 ```
 gross_margin(period) = revenue(period) - cogs_full(period)

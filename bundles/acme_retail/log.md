@@ -1,9 +1,8 @@
----
-type: Log
-title: Acme Retail bundle history
----
-
 # Bundle history
+
+## 2026-10-23
+
+- **Migrated** the bundle to OKF v0.3. Path fields now start with `/` so that they resolve from the bundle root. The bundle-root `index.md` declares `okf_version: "0.3"`. This log no longer has frontmatter. The `not` key in `metrics/gross-margin.md` is now the extension key `x-acme-not`.
 
 ## 2026-07-01
 

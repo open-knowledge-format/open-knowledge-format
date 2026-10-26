@@ -44,4 +44,4 @@ A lookup catalog defining the meaning of the `PostTypeId` attribute used in the 
 | 15 | CollectiveDiscussion | Stack Overflow Collectives discussion threads. |
 | 17 | CollectiveCollection | Stack Overflow Collectives collections. |
 
-[^1]: Verified from [Database Schema Documentation](https://meta.stackexchange.com/questions/2677/database-schema-documentation-for-the-public-data-dump-and-sede) and [PostTypeId Meanings](https://meta.stackexchange.com/questions/99265/meaning-of-values-for-posttypeid-in-data-explorer-or-in-data-dump) on Meta Stack Exchange.
+[^meta_schema_doc]: Verified from [Database Schema Documentation](https://meta.stackexchange.com/questions/2677/database-schema-documentation-for-the-public-data-dump-and-sede) and [PostTypeId Meanings](https://meta.stackexchange.com/questions/99265/meaning-of-values-for-posttypeid-in-data-explorer-or-in-data-dump) on Meta Stack Exchange.

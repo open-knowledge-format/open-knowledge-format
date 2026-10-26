@@ -54,4 +54,4 @@ A lookup catalog defining the meaning of the `VoteTypeId` attribute in the `vote
 | 36 | privateAiAnswerIncorrect | Vote stating AI answer is incorrect (experiment). |
 | 37 | privateAiAnswerPartiallyCorrect | Vote stating AI answer is partially correct. |
 
-[^1]: Verified from [Database Schema Documentation](https://meta.stackexchange.com/questions/2677/database-schema-documentation-for-the-public-data-dump-and-sede) and [List of Vote type IDs](https://meta.stackexchange.com/questions/171176/list-of-vote-type-ids) on Meta Stack Exchange.
+[^meta_schema_doc]: Verified from [Database Schema Documentation](https://meta.stackexchange.com/questions/2677/database-schema-documentation-for-the-public-data-dump-and-sede) and [List of Vote type IDs](https://meta.stackexchange.com/questions/171176/list-of-vote-type-ids) on Meta Stack Exchange.

@@ -1,3 +1,9 @@
+---
+okf_version: "0.3"
+title: Acme Retail
+description: Tables, metrics, policies, and sanctioned computations for Acme Retail finance. Use it for revenue and gross-margin questions.
+---
+
 # Subdirectories
 
 * [tables](tables/index.md) - BigQuery tables the bundle grounds against.

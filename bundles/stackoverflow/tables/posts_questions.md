@@ -18,7 +18,7 @@ sources:
 
 This table contains all question posts from Stack Overflow, including their content, metadata, and various counts related to activity and user engagement. Each row represents a unique question post. This table can be joined with other tables like [posts_answers](posts_answers.md) to link questions to their corresponding answers, or with [users](users.md) to get more information about the question's owner.
 
-For a detailed catalog of the `post_type_id` column values, see the [Post Types Reference](../references/post_types.md). For details on post licensing, see the [Creative Commons Content Licenses Reference](../references/content_licenses.md). [^1]
+For a detailed catalog of the `post_type_id` column values, see the [Post Types Reference](../references/post_types.md). For details on post licensing, see the [Creative Commons Content Licenses Reference](../references/content_licenses.md). [^meta_schema_doc]
 
 # Schema
 
@@ -38,7 +38,7 @@ For a detailed catalog of the `post_type_id` column values, see the [Post Types 
 - `owner_display_name`: STRING, Display name of the question's owner.
 - `owner_user_id`: INTEGER, User ID of the question's owner (links to [users](users.md)).
 - `parent_id`: STRING, Parent ID (not typically used for questions).
-- `post_type_id`: INTEGER, Type of post (1 for question). See [Post Types Reference](../references/post_types.md). [^1]
+- `post_type_id`: INTEGER, Type of post (1 for question). See [Post Types Reference](../references/post_types.md). [^meta_schema_doc]
 - `score`: INTEGER, The score of the question.
 - `tags`: STRING, Tags associated with the question, separated by '|'.
 - `view_count`: INTEGER, Number of times the question has been viewed.
@@ -89,13 +89,13 @@ ORDER BY
 
 # Metrics
 
-- [Accepted Answer Rate](../references/metrics/accepted_answer_rate.md) — Calculates the proportion of questions having an accepted answer. [^1]
+- [Accepted Answer Rate](../references/metrics/accepted_answer_rate.md) — Calculates the proportion of questions having an accepted answer. [^meta_schema_doc]
 
 # Joins
 
-- [posts_answers](../references/joins/posts_answers__posts_questions.md) — join on `id` ↔ `parent_id` to attach answers to questions. [^1]
-- [comments](../references/joins/comments__posts.md) — join on `id` ↔ `post_id` to correlate comments with questions. [^1]
-- [votes](../references/joins/posts__votes.md) — join on `id` ↔ `post_id` to find votes/flags on questions. [^1]
-- [post_links](../references/joins/post_links__posts.md) — join on `id` ↔ `post_id` to discover duplicate and related question links. [^1]
+- [posts_answers](../references/joins/posts_answers__posts_questions.md) — join on `id` ↔ `parent_id` to attach answers to questions. [^meta_schema_doc]
+- [comments](../references/joins/comments__posts.md) — join on `id` ↔ `post_id` to correlate comments with questions. [^meta_schema_doc]
+- [votes](../references/joins/posts__votes.md) — join on `id` ↔ `post_id` to find votes/flags on questions. [^meta_schema_doc]
+- [post_links](../references/joins/post_links__posts.md) — join on `id` ↔ `post_id` to discover duplicate and related question links. [^meta_schema_doc]
 
-[^1]: Sourced from [Database Schema Documentation](https://meta.stackexchange.com/questions/2677/database-schema-documentation-for-the-public-data-dump-and-sede) on Meta Stack Exchange.
+[^meta_schema_doc]: Sourced from [Database Schema Documentation](https://meta.stackexchange.com/questions/2677/database-schema-documentation-for-the-public-data-dump-and-sede) on Meta Stack Exchange.
