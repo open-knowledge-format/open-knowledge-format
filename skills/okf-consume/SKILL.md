@@ -1,13 +1,13 @@
 ---
 name: okf-consume
-description: Answer questions from an Open Knowledge Format (OKF) bundle, a directory of Markdown files with YAML frontmatter, and report the provenance, trust tier, freshness, and attestation status of every concept used. Use this skill when the user points at an OKF bundle or at a directory of Markdown files with index.md files and frontmatter type fields; asks what a metric, table, policy, or procedure means according to that bundle; asks for a number that the bundle defines with an Attested Computation; or asks which concepts are stale, deprecated, or unverified. Do not use it to create, edit, verify, migrate, or repair a bundle; use okf-generate for that.
+description: Answer questions from an Open Knowledge Format (OKF) bundle, a directory of Markdown files with YAML frontmatter, and report the provenance, trust tier, freshness, and attestation status of every concept used. Use this skill when the user points at an OKF bundle or at a directory of Markdown files with index.md files and frontmatter type fields; asks what a metric, table, policy, or procedure means according to that bundle; asks for a number that the bundle defines with an Attested Computation; or asks which concepts are stale, deprecated, or unverified.
 ---
 
 # Answer from an OKF bundle
 
-This skill answers questions from an OKF v0.3 bundle and reports how far the reader can trust each concept that it used. The specification is [`SPEC.md`](https://github.com/open-knowledge-format/open-knowledge-format/blob/main/SPEC.md) in the OKF repository. [references/trust.md](references/trust.md) gives the exact trust, freshness, conflict, path, and value rules.
+This skill only reads a bundle. If the task is to create, change, repair, migrate, or verify a bundle, stop and use the `okf-generate` skill instead.
 
-This skill only reads a bundle. To create or change a bundle, use the `okf-generate` skill.
+This skill answers questions from an OKF v0.3 bundle and reports how far the reader can trust each concept that it used. The specification is [`SPEC.md`](https://github.com/open-knowledge-format/open-knowledge-format/blob/main/SPEC.md) in the OKF repository. [references/trust.md](references/trust.md) gives the exact trust, freshness, conflict, path, and value rules.
 
 ## Rules
 

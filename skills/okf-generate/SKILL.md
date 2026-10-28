@@ -1,6 +1,6 @@
 ---
 name: okf-generate
-description: Create, update, migrate, repair, or validate an Open Knowledge Format (OKF) v0.3 bundle, including recording a verification. An OKF bundle is a directory of Markdown files with YAML frontmatter that documents data assets, metrics, policies, and procedures for people and agents. Use this skill when the user asks to write, generate, bootstrap, enrich, or migrate OKF documents or a knowledge bundle; to document tables, datasets, metrics, APIs, or playbooks in OKF; to add provenance, trust, lifecycle, or attested-computation fields; or to check a bundle for OKF conformance.
+description: Create, update, migrate, repair, or validate an Open Knowledge Format (OKF) v0.3 bundle, including recording a verification. An OKF bundle is a directory of Markdown files with YAML frontmatter that documents data assets, metrics, policies, and procedures for people and agents. Use this skill when the user asks to write, generate, bootstrap, enrich, or migrate OKF documents or a knowledge bundle; to document tables, datasets, metrics, APIs, or playbooks in OKF; to add provenance, trust, lifecycle, or attested-computation fields; or to check a bundle for OKF conformance. Use this skill, not okf-consume, to repair a bundle or to record a verification.
 ---
 
 # Generate an OKF bundle
@@ -13,14 +13,12 @@ To answer questions from a bundle, use the `okf-consume` skill.
 
 ## Rules
 
-Obey these rules in every run.
-
 1. **Write only what a source supports.** Do not invent columns, partitions, URLs, owners, numbers, policies, or review dates. If a fact has no source, omit it or ask the user.
 2. **Record provenance.** List the sources of each concept in `sources`. Attach each specific claim to its source with a footnote whose label is the source `id`.
 3. **Record authorship honestly.** Set `generated.by` to your own actor, `<tool>/<model>`, where `<tool>` is the agent product, such as `claude-code`, `codex`, or `antigravity`.
 4. **Do not claim a verification that did not occur.** Do not add a `verified` entry to content that you generated in this run. Add a `human:<id>` entry only when that person confirmed the content, asked you to record it, and stated their id. Never infer an id from the machine, such as a login name or git configuration. Without an id, record no verification and say why.
 5. **Never write the computation of an Attested Computation.** Copy it exactly from a sanctioned source, such as an approved SQL file, a dbt model, or a query from its owner. Cite that source. If no sanctioned computation exists, describe the metric without one and report the gap. Do not store an unreviewed query in the bundle unless the user explicitly asks; then store it as a Reference with `status: draft`, never linked as a computation.
-6. **Keep what you do not own.** When you update a file, keep its unknown keys, its `verified` history, and text that a person wrote. Do not rewrite values that you did not change. Refine the document; do not rewrite it.
+6. **Keep what you do not own.** When you update a file, keep its unknown keys, its `verified` history, and text that a person wrote. Do not rewrite values that you did not change.
 
 ## Procedure
 
