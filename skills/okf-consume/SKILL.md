@@ -97,9 +97,9 @@ If the question asks for a value, and an Attested Computation produces it, do th
 
 ### 7. Answer
 
-Give the answer first. Then list:
+Give the answer first. Then list the items below. Write each OKF term exactly as it appears here, not as a paraphrase.
 
-- **Concepts used:** each concept ID with its trust tier by name (`unverified`, `machine-confirmed`, or `human-reviewed`), its status, and its freshness. The trust tier describes the definition. When a value comes from an Attested Computation, also give the attestation result, which describes this run.
+- **Concepts used:** each concept ID with its trust tier (`unverified`, `machine-confirmed`, or `human-reviewed`), its status, and its freshness. The trust tier describes the definition. When a value comes from an Attested Computation, also write `attested` or `not attested`. That result describes this run.
 - **Citations:** for each footnote label `[^id]` that supports the answer, the `title` and `resource` of the `sources` entry with that `id`.
 - **Gaps:** the parts of the question that the bundle does not cover.
 
