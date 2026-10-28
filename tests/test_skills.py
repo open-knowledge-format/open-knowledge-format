@@ -65,9 +65,9 @@ def _write(root: Path, relpath: str, text: str) -> None:
 
 def test_manifests_name_version_and_description_agree():
     claude_market = _load_json(".claude-plugin/marketplace.json")
-    claude_plugin = _load_json(".claude-plugin/plugin.json")
+    claude_plugin = _load_json("skills/.claude-plugin/plugin.json")
     codex_market = _load_json(".agents/plugins/marketplace.json")
-    codex_plugin = _load_json(".codex-plugin/plugin.json")
+    codex_plugin = _load_json("skills/.codex-plugin/plugin.json")
     antigravity = _load_json(".antigravity-plugin/plugin.json")
 
     claude_entry = claude_market["plugins"][0]
@@ -83,14 +83,18 @@ def test_manifests_name_version_and_description_agree():
     assert len({m["description"] for m in described}) == 1
 
 
-def test_manifests_point_at_the_repo_root_and_skills_dir():
+def test_manifests_make_the_skills_dir_the_plugin_root():
+    # The marketplaces stay at the repository root, where `owner/repo` installs
+    # look for them. The plugin is skills/, so an install copies only the skills.
     claude_entry = _load_json(".claude-plugin/marketplace.json")["plugins"][0]
     codex_entry = _load_json(".agents/plugins/marketplace.json")["plugins"][0]
-    codex_plugin = _load_json(".codex-plugin/plugin.json")
+    claude_plugin = _load_json("skills/.claude-plugin/plugin.json")
+    codex_plugin = _load_json("skills/.codex-plugin/plugin.json")
 
-    assert claude_entry["source"] == "./"
-    assert codex_entry["source"] == {"source": "local", "path": "./"}
-    assert codex_plugin["skills"] == "./skills/"
+    assert claude_entry["source"] == "./skills"
+    assert codex_entry["source"] == {"source": "local", "path": "./skills"}
+    assert claude_plugin["skills"] == "./"
+    assert codex_plugin["skills"] == "./"
 
 
 # ---- skill folders -----------------------------------------------------------

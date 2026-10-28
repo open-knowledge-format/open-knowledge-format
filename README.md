@@ -265,7 +265,7 @@ that teach coding agents to work with OKF:
   and reports the trust tier, freshness, and attestation status of each concept
   that the answer uses.
 
-The repository root is a plugin for Claude Code, Codex, and Antigravity:
+Install the skills as a plugin in Claude Code, Codex, or Antigravity:
 
 | Tool | Install |
 |---|---|

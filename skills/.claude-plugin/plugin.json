@@ -14,5 +14,6 @@
     "knowledge",
     "metadata",
     "agent-skills"
-  ]
+  ],
+  "skills": "./"
 }
