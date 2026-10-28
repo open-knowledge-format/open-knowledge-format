@@ -56,7 +56,7 @@ Obey these rules in every run.
 1. When the text names another concept in the bundle, link to it with a standard Markdown link. Link each concept once per section. Do not link from headings, code blocks, or schema field names.
 2. Write links in the body relative to the file, for example `../tables/orders.md`, because that form displays correctly on GitHub.
 3. Write path fields (`resource`, `sources[].resource`, `computation`, `executor.resource`, `attester.resource`, `superseded_by`) with a leading `/`, for example `/references/attesters/sql-equality.py`. A path field without a leading `/` resolves from the directory of its file, not from the bundle root.
-4. Percent-encode a space or another reserved character in a path, for example `my%20concept.md`.
+4. Percent-encode spaces in paths, such as `my%20concept.md`.
 5. Link only to concepts that exist or that you create in this run.
 
 ### 5. Record provenance, trust, and lifecycle
@@ -70,7 +70,7 @@ Obey these rules in every run.
 7. For normal content, omit `status`. A missing `status` means `stable`.
 8. If the content is incomplete or needs review by its owner, set `status: draft`.
 9. If a concept is retired, keep the file and set `status: deprecated`. If a replacement exists, set `superseded_by` to its path, and state the reason in the body.
-10. To move or rename a concept, keep a short deprecated concept at the old path with `superseded_by` set to the new path.
+10. To move or rename a concept, keep its `generated` and `verified` values, because a move does not change its meaning. Keep a short deprecated concept at the old path with `superseded_by` set to the new path.
 11. Set `stale_after` only when a source has a known review or refresh cycle. Do not guess a date.
 
 ### 6. Write an attested computation
@@ -101,7 +101,7 @@ Do this step only when you have a sanctioned computation (rule 5).
 
 2. Fix each error. An error means that the bundle does not conform to OKF v0.3 (section 11.1): a frontmatter block does not parse, a key repeats, or a reserved file breaks its rules.
 3. Fix each warning, or tell the user why you kept it. Warning `W120` marks a Markdown file that is not a concept, which is correct only for documentation such as a `README.md`.
-4. Read the info findings. They report stale concepts, verifications that are older than the content, and computations that cannot be attested.
+4. Read the info findings, such as stale concepts and verifications that are older than the content.
 5. If you cannot run the script, check the conformance rules of section 11.1 by hand.
 
 The validator needs Python 3.9 or later and PyYAML (`pip install pyyaml`). Use `--json` for structured output and `--strict` to fail on warnings.
