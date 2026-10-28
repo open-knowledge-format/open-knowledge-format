@@ -7,6 +7,7 @@ generated: { by: human:jsmith@acme, at: 2024-01-15T10:00:00Z }
 verified:
   - { by: human:jsmith@acme, at: 2024-01-15T10:00:00Z }
 status: deprecated
+superseded_by: /metrics/gross-margin.md
 ---
 
 # Deprecated
