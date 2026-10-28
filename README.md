@@ -253,6 +253,30 @@ The HTML embeds the bundle as a JSON blob and uses
 both loaded from a CDN. No data leaves the page; the bundle is parsed
 once at generation time and serialized into the file.
 
+## Agent skills
+
+The [`skills/`](skills/) directory holds two [Agent Skills](https://agentskills.io)
+that teach coding agents to work with OKF:
+
+- [`okf-generate`](skills/okf-generate/SKILL.md) writes, updates, or migrates an OKF
+  bundle from sources that the agent can read, and validates the result with
+  [`scripts/validate.py`](skills/okf-generate/scripts/validate.py).
+- [`okf-consume`](skills/okf-consume/SKILL.md) answers questions from a bundle
+  and reports the trust tier, freshness, and attestation status of each concept
+  that the answer uses.
+
+The repository root is a plugin for Claude Code, Codex, and Antigravity:
+
+| Tool | Install |
+|---|---|
+| Claude Code | `/plugin marketplace add open-knowledge-format/open-knowledge-format`, then `/plugin install okf@open-knowledge-format` |
+| Codex CLI | `codex plugin marketplace add open-knowledge-format/open-knowledge-format`, then `codex plugin add okf@open-knowledge-format` |
+| Antigravity CLI 1.3.2 or later | `agy plugin install https://github.com/open-knowledge-format/open-knowledge-format` |
+
+A tool without plugin support can load a skill from its skills directory. Copy
+a folder from `skills/` to `~/.agents/skills/` for the Codex IDE extension, or
+to `~/.gemini/config/skills/` for the Antigravity app and IDE.
+
 ## Tests
 
 ```
