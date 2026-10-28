@@ -32,7 +32,7 @@ To answer questions from a bundle, use the `okf-consume` skill.
 ### 2. Plan the tree
 
 1. Plan one concept per file. The concept ID is the file path without `.md`.
-2. Group concepts in directories by kind, for example `datasets/`, `tables/`, `metrics/`, `computations/`, `policies/`, `playbooks/`, and `references/`. OKF does not fix a taxonomy. Reuse the directory names that the bundle already has.
+2. Group concepts in directories by kind, for example `datasets/`, `tables/`, `metrics/`, `computations/`, `policies/`, `playbooks/`, and `references/`. Reuse the directory names that the bundle already has.
 3. Use stable lowercase file names, and never two paths that differ only by case.
 4. Do not name a concept `index.md` or `log.md`.
 5. If you plan more than 10 files, show the planned tree to the user before you write them.
@@ -67,7 +67,7 @@ To answer questions from a bundle, use the `okf-consume` skill.
 6. Write actors as `<producer>/<version>` or `<scheme>:<id>`, with the schemes `human:`, `team:`, and `process:`. Only `human:` gives the human-reviewed trust tier.
 7. For normal content, omit `status`. A missing `status` means `stable`.
 8. If the content is incomplete or needs review by its owner, set `status: draft`.
-9. If a concept is retired, keep the file and set `status: deprecated`. If a replacement exists, set `superseded_by` to its path, and state the reason in the body.
+9. If a concept is retired, keep the file with its definition and `verified` history, and set `status: deprecated`. If a replacement exists, set `superseded_by` to its path, and state the reason in the body.
 10. To move or rename a concept, keep its `generated` and `verified` values, because a move does not change its meaning. Keep a short deprecated concept at the old path with `superseded_by` set to the new path.
 11. Set `stale_after` only when a source has a known review or refresh cycle. Do not guess a date.
 
