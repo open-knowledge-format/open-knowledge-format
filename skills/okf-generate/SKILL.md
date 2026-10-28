@@ -1,6 +1,6 @@
 ---
 name: okf-generate
-description: Create, update, migrate, or validate an Open Knowledge Format (OKF) v0.3 bundle. An OKF bundle is a directory of Markdown files with YAML frontmatter that documents data assets, metrics, policies, and procedures for people and agents. Use this skill when the user asks to write, generate, bootstrap, enrich, or migrate OKF documents or a knowledge bundle; to document tables, datasets, metrics, APIs, or playbooks in OKF; to add provenance, trust, lifecycle, or attested-computation fields; or to check a bundle for OKF conformance.
+description: Create, update, migrate, repair, or validate an Open Knowledge Format (OKF) v0.3 bundle, including recording a verification. An OKF bundle is a directory of Markdown files with YAML frontmatter that documents data assets, metrics, policies, and procedures for people and agents. Use this skill when the user asks to write, generate, bootstrap, enrich, or migrate OKF documents or a knowledge bundle; to document tables, datasets, metrics, APIs, or playbooks in OKF; to add provenance, trust, lifecycle, or attested-computation fields; or to check a bundle for OKF conformance.
 ---
 
 # Generate an OKF bundle
@@ -18,8 +18,8 @@ Obey these rules in every run.
 1. **Write only what a source supports.** Do not invent columns, partitions, URLs, owners, numbers, policies, or review dates. If a fact has no source, omit it or ask the user.
 2. **Record provenance.** List the sources of each concept in `sources`. Attach each specific claim to its source with a footnote whose label is the source `id`.
 3. **Record authorship honestly.** Set `generated.by` to your own actor, `<tool>/<model>`, where `<tool>` is the agent product, such as `claude-code`, `codex`, or `antigravity`.
-4. **Do not claim a verification that did not occur.** Do not add a `verified` entry to content that you generated in this run. Add a `human:<id>` entry only when that person confirmed the content and asked you to record it.
-5. **Never write the computation of an Attested Computation.** Copy it exactly from a sanctioned source, such as an approved SQL file, a dbt model, or a query from its owner. Cite that source. If no sanctioned computation exists, describe the metric without one and report the gap.
+4. **Do not claim a verification that did not occur.** Do not add a `verified` entry to content that you generated in this run. Add a `human:<id>` entry only when that person confirmed the content, asked you to record it, and stated their id. Never infer an id from the machine, such as a login name or git configuration. If the id is missing, record no verification and tell the user why.
+5. **Never write the computation of an Attested Computation.** Copy it exactly from a sanctioned source, such as an approved SQL file, a dbt model, or a query from its owner. Cite that source. If no sanctioned computation exists, describe the metric without one and report the gap. Do not store an unreviewed query in the bundle unless the user explicitly asks; then store it as a Reference with `status: draft`, never linked as a computation.
 6. **Keep what you do not own.** When you update a file, keep its unknown keys, its `verified` history, and text that a person wrote. Do not rewrite values that you did not change. Refine the document; do not rewrite it.
 
 ## Procedure
@@ -53,7 +53,7 @@ Obey these rules in every run.
 
 ### 4. Link concepts and write paths
 
-1. When the text names another concept in the bundle, link to it with a standard Markdown link. Link each concept once per section. Do not link from headings, code blocks, or schema field names.
+1. When the text names another concept in the bundle, link to it with a standard Markdown link, once per section and not from headings or code.
 2. Write links in the body relative to the file, for example `../tables/orders.md`, because that form displays correctly on GitHub.
 3. Write path fields (`resource`, `sources[].resource`, `computation`, `executor.resource`, `attester.resource`, `superseded_by`) with a leading `/`, for example `/references/attesters/sql-equality.py`. A path field without a leading `/` resolves from the directory of its file, not from the bundle root.
 4. Percent-encode spaces in paths, such as `my%20concept.md`.
@@ -63,7 +63,7 @@ Obey these rules in every run.
 
 1. Give each `sources` entry a stable `id`, the required `resource`, and a `title`.
 2. Add `author` (an actor), `usage_count`, or `last_modified` only when you have the real value. Give each `usage_count` a `usage_window`.
-3. If the content came from the asset itself, list the concept's own `resource` as a source.
+3. List the concept's own `resource` as a source when the content came from it.
 4. Cite a specific claim with a footnote, for example `Revenue excludes tax.[^rev-policy]`. Define it as `[^rev-policy]: Revenue recognition policy`. The label must equal a `sources[].id`. Do not use numbered labels such as `[^1]`.
 5. Set `generated: { by: "<your actor>", at: "<current UTC time>" }` on each concept that you create or change in meaning. If your change only fixes format, whitespace, or links, keep the existing `generated` value.
 6. Write actors as `<producer>/<version>` or `<scheme>:<id>`, with the schemes `human:`, `team:`, and `process:`. Only `human:` gives the human-reviewed trust tier.
@@ -89,7 +89,6 @@ Do this step only when you have a sanctioned computation (rule 5).
 4. Give the root `index.md` frontmatter with `okf_version: "0.3"`, a `title`, a one-sentence `description` of the scope of the bundle and when to use it, and a `license` when you know it. Agents use the description to choose a bundle.
 5. When you regenerate the root `index.md`, keep its existing frontmatter.
 6. Add an entry to `log.md` for the change. Do not put frontmatter in `log.md`. Use a `## YYYY-MM-DD` heading and put the newest date first.
-7. Start each log item with a bold word, such as `**Creation**`, `**Update**`, or `**Deprecation**`.
 
 ### 8. Validate
 
@@ -99,8 +98,8 @@ Do this step only when you have a sanctioned computation (rule 5).
    python3 scripts/validate.py <bundle-root>
    ```
 
-2. Fix each error. An error means that the bundle does not conform to OKF v0.3 (section 11.1): a frontmatter block does not parse, a key repeats, or a reserved file breaks its rules.
-3. Fix each warning, or tell the user why you kept it. Warning `W120` marks a Markdown file that is not a concept, which is correct only for documentation such as a `README.md`.
+2. Fix each error. Errors mark conformance failures (section 11.1).
+3. Fix each warning, or tell the user why you kept it. Warning `W120`, a file that is not a concept, is correct only for documentation such as a `README.md`.
 4. Read the info findings, such as stale concepts and verifications that are older than the content.
 5. If you cannot run the script, check the conformance rules of section 11.1 by hand.
 
@@ -118,10 +117,9 @@ Tell the user:
 
 ## Update an existing bundle
 
-1. Read the current document before you change it.
-2. Change only what your sources support. Keep the other content and its exact form.
-3. Update `generated.at` only for a change in meaning.
-4. Keep each `verified` entry. A verification counts only when it is not older than `generated.at`, so a change in meaning needs a new verification. Tell the user.
+1. Change only what your sources support. Keep the other content and its exact form.
+2. Update `generated.at` only for a change in meaning.
+3. Keep each `verified` entry. A verification counts only when it is not older than `generated.at`, so a change in meaning needs a new verification. Tell the user.
 
 ## Migrate an older bundle
 

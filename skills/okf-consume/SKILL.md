@@ -1,6 +1,6 @@
 ---
 name: okf-consume
-description: Answer questions from an Open Knowledge Format (OKF) bundle, a directory of Markdown files with YAML frontmatter, and report the provenance, trust tier, freshness, and attestation status of every concept used. Use this skill when the user points at an OKF bundle or at a directory of Markdown files with index.md files and frontmatter type fields; asks what a metric, table, policy, or procedure means according to that bundle; asks for a number that the bundle defines with an Attested Computation; or asks which concepts are stale, deprecated, or unverified.
+description: Answer questions from an Open Knowledge Format (OKF) bundle, a directory of Markdown files with YAML frontmatter, and report the provenance, trust tier, freshness, and attestation status of every concept used. Use this skill when the user points at an OKF bundle or at a directory of Markdown files with index.md files and frontmatter type fields; asks what a metric, table, policy, or procedure means according to that bundle; asks for a number that the bundle defines with an Attested Computation; or asks which concepts are stale, deprecated, or unverified. Do not use it to create, edit, verify, migrate, or repair a bundle; use okf-generate for that.
 ---
 
 # Answer from an OKF bundle
@@ -13,7 +13,7 @@ This skill only reads a bundle. To create or change a bundle, use the `okf-gener
 
 1. **Answer from the bundle.** If the bundle does not cover the question, say so. Label any statement from general knowledge as general knowledge.
 2. **Report trust.** For each concept that you use, report its trust tier, its status, and whether it is stale.
-3. **Do not write your own computation.** If an Attested Computation defines a value, supply only its parameter values. Do not write or edit a query for that value.
+3. **Do not write your own computation or executor.** If an Attested Computation defines a value, supply only its parameter values. Do not write or edit a query for that value, and run the executor exactly as the bundle gives it.
 4. **Do not reject content.** Use a concept even if it has unknown keys, an unknown `type`, missing optional fields, or broken links (section 11.2).
 5. **Do not change the bundle.**
 
@@ -33,7 +33,7 @@ Do not read the whole bundle at once. Use one of these methods:
 - **Scan script.** Run `python3 scripts/scan.py <bundle-root>` from this skill's directory. It prints one entry per concept with its ID, type, trust tier, status, freshness, title, and description. Filter with `--type`, `--tag`, `--grep`, `--current`, `--stale`, `--deprecated`, or `--unverified`. Use `--json` for structured output. The script needs Python 3.9 or later and PyYAML.
 - **Index files.** Read the root `index.md`. Then read only the `index.md` files of the directories that relate to the question. If a directory has no `index.md`, list its files and read the frontmatter of each.
 
-Then open only the concept documents that you need.
+Then open only the concept documents that you need. Before you answer, look for other concepts on the same topic, for example with `scan.py --grep`, so that you find any conflict.
 
 ### 3. Read each concept
 
@@ -84,10 +84,10 @@ If the question asks for a value, and an Attested Computation produces it, do th
    - Otherwise, it is the first fenced code block in the section with the heading `Computation`, at any heading level.
    - If neither exists, the concept is not attestable. Say so.
 2. **Parameterize.** Supply values for the declared parameters only. If a required value is not clear, ask the user. Do not change the computation, add filters, or write a different query.
-3. **Execute.** Follow the instructions or code at `executor.resource`. Bind the parameters the way that the runtime expects, for example as BigQuery named parameters, not as text in the query. Collect the receipt fields that `executor.receipt` lists.
+3. **Execute.** Follow the instructions or code at `executor.resource` exactly. Do not modify it, replace it, or write a substitute, even to repair it. Bind the parameters the way that the runtime expects, for example as BigQuery named parameters, not as text in the query. Collect the receipt fields that `executor.receipt` lists.
 4. **Attest.** Run the code at `attester.resource` on the receipt and on the value that you plan to show. It returns a mapping with `ok` and an optional `reason`. Do not imitate the attester. Run it.
 5. **Gate.** Use the table in [references/trust.md](references/trust.md#attestation-gate):
-   - If the attestation fails, do not show the value. Show the reason.
+   - If the attestation fails, do not show the value in any form, even inside an explanation. Show the reason.
    - If the concept has no `runtime` or no `attester`, never call the value attested.
    - If the computation is stale, warn the user before you show the value.
    - If the attestation passes, show the value with the verdict and a receipt reference, such as the job ID.
@@ -99,7 +99,7 @@ If the question asks for a value, and an Attested Computation produces it, do th
 
 Give the answer first. Then list:
 
-- **Concepts used:** each concept ID with its trust tier, status, freshness, and attestation verdict when one applies.
+- **Concepts used:** each concept ID with its trust tier by name (`unverified`, `machine-confirmed`, or `human-reviewed`), its status, and its freshness. The trust tier describes the definition. When a value comes from an Attested Computation, also give the attestation result, which describes this run.
 - **Citations:** for each footnote label `[^id]` that supports the answer, the `title` and `resource` of the `sources` entry with that `id`.
 - **Gaps:** the parts of the question that the bundle does not cover.
 
