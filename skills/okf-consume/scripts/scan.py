@@ -223,15 +223,15 @@ def freshness(concept: dict) -> str:
     return "no stale_after"
 
 
-def matches(concept: dict, args: argparse.Namespace) -> bool:
+def matches(concept: dict, args: argparse.Namespace, root: Path) -> bool:
     if args.type and str(concept["type"] or "").casefold() != args.type.casefold():
         return False
     if args.tag and args.tag.casefold() not in {t.casefold() for t in concept["tags"]}:
         return False
     if args.grep:
-        haystack = " ".join(
-            [concept["id"], concept["title"], str(concept["description"] or "")] + concept["tags"]
-        ).casefold()
+        # Search the whole file, so that a value stated only in a body is found.
+        text = (root / concept["path"]).read_text(encoding="utf-8")
+        haystack = " ".join([concept["id"], concept["title"], text]).casefold()
         if args.grep.casefold() not in haystack:
             return False
     if args.current and not concept["current"]:
@@ -248,7 +248,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("bundle", type=Path, help="bundle root directory")
     parser.add_argument("--type", help="only concepts of this type (case-insensitive)")
     parser.add_argument("--tag", help="only concepts with this tag (case-insensitive)")
-    parser.add_argument("--grep", help="only concepts whose ID, title, description, or tags contain TEXT")
+    parser.add_argument("--grep", help="only concepts whose ID, frontmatter, or body contains TEXT")
     parser.add_argument("--current", action="store_true", help="only current concepts (stable or draft)")
     parser.add_argument("--stale", action="store_true", help="only stale concepts")
     parser.add_argument("--deprecated", action="store_true", help="only deprecated concepts")
@@ -283,7 +283,7 @@ def main(argv: list[str] | None = None) -> int:
             not_concepts.append({"path": rel.as_posix(), "reason": problem or "no type"})
             continue
         concepts.append(describe(bundle, path, meta, now))
-    selected = [c for c in concepts if matches(c, args)]
+    selected = [c for c in concepts if matches(c, args, root)]
 
     summary = {
         "concepts": len(concepts),

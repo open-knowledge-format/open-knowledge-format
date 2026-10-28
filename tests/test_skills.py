@@ -346,3 +346,14 @@ def test_scan_filters_by_type_and_status():
     }
     deprecated = _scan(BUNDLES / "acme_retail", "--deprecated")["concepts"]
     assert [c["id"] for c in deprecated] == ["metrics/gross-margin-legacy"]
+
+
+def test_scan_grep_searches_the_body(tmp_path: Path):
+    _write(tmp_path, "policies/shipping.md", "---\ntype: Policy\ntitle: Shipping policy\n---\nFree over $50.\n")
+    _write(
+        tmp_path,
+        "playbooks/macros.md",
+        "---\ntype: Playbook\ntitle: Reply macros\n---\n- Standard shipping is free on orders of $45 or more.\n",
+    )
+    found = {c["id"] for c in _scan(tmp_path, "--grep", "SHIPPING")["concepts"]}
+    assert found == {"policies/shipping", "playbooks/macros"}
