@@ -1,6 +1,10 @@
 ---
 name: okf-generate
 description: Create, update, migrate, repair, or validate an Open Knowledge Format (OKF) v0.3 bundle, including recording a verification. An OKF bundle is a directory of Markdown files with YAML frontmatter that documents data assets, metrics, policies, and procedures for people and agents. Use this skill when the user asks to write, generate, bootstrap, enrich, or migrate OKF documents or a knowledge bundle; to document tables, datasets, metrics, APIs, or playbooks in OKF; to add provenance, trust, lifecycle, or attested-computation fields; or to check a bundle for OKF conformance. Use this skill, not okf-consume, to repair a bundle or to record a verification.
+license: Apache-2.0
+metadata:
+  version: "0.1.0"
+  publisher: google
 ---
 
 # Generate an OKF bundle
@@ -41,7 +45,7 @@ To answer questions from a bundle, use the `okf-consume` skill.
 
 1. Start the file with a line that is exactly `---`, and end the frontmatter with the next `---` line.
 2. Set `type` to a short descriptive name, for example `BigQuery Table`, `Metric`, `Playbook`, `Reference`, or `Attested Computation`. Reuse the type names that the bundle already uses.
-3. Write `description` as one sentence. Index files and search snippets copy it.
+3. Write `description` as one sentence.
 4. If the concept describes an asset, set `resource` to the canonical URI of that asset.
 5. Write `tags` as a YAML list, for example `[sales, orders]`. A consumer reads a scalar `tags` value as one tag, so `tags: sales, orders` is the single tag `sales, orders`.
 6. Write `generated.at` and `verified[].at` as RFC 3339 date-times with an offset, such as `"2026-06-30T14:00:00Z"`. Other timestamps can also be a date, such as `"2026-12-31"`, which means 00:00 UTC on that day.
@@ -98,7 +102,7 @@ Do this step only when you have a sanctioned computation (rule 5).
 
 2. Fix each error. Errors mark conformance failures (section 11.1).
 3. Fix each warning, or tell the user why you kept it. Warning `W120`, a file that is not a concept, is correct only for documentation such as a `README.md`.
-4. Read the info findings, such as stale concepts and verifications that are older than the content.
+4. Read the info findings, such as stale concepts and verifications older than the content.
 5. If you cannot run the script, check the conformance rules of section 11.1 by hand.
 
 The validator needs Python 3.9 or later and PyYAML (`pip install pyyaml`). Use `--json` for structured output and `--strict` to fail on warnings.
