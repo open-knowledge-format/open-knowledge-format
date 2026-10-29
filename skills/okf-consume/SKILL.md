@@ -1,6 +1,10 @@
 ---
 name: okf-consume
 description: Answer questions from an Open Knowledge Format (OKF) bundle, a directory of Markdown files with YAML frontmatter, and report the provenance, trust tier, freshness, and attestation status of every concept used. Use this skill when the user points at an OKF bundle or at a directory of Markdown files with index.md files and frontmatter type fields; asks what a metric, table, policy, or procedure means according to that bundle; asks for a number that the bundle defines with an Attested Computation; or asks which concepts are stale, deprecated, or unverified.
+license: Apache-2.0
+metadata:
+  version: "0.1.0"
+  publisher: google
 ---
 
 # Answer from an OKF bundle

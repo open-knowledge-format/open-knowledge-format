@@ -119,6 +119,16 @@ def test_skill_frontmatter_follows_agent_skills_limits(skill_dir: Path):
 
 
 @pytest.mark.parametrize("skill_dir", SKILL_DIRS, ids=lambda p: p.name)
+def test_skill_frontmatter_has_license_version_and_publisher(skill_dir: Path):
+    meta, _ = _frontmatter(skill_dir / "SKILL.md")
+    assert meta["license"] == _load_json("skills/.claude-plugin/plugin.json")["license"]
+    # Agent Skills metadata maps string keys to string values.
+    assert all(isinstance(k, str) and isinstance(v, str) for k, v in meta["metadata"].items())
+    assert meta["metadata"]["version"] == VERSION
+    assert meta["metadata"]["publisher"] == "google"
+
+
+@pytest.mark.parametrize("skill_dir", SKILL_DIRS, ids=lambda p: p.name)
 def test_skill_relative_links_resolve(skill_dir: Path):
     for md in skill_dir.rglob("*.md"):
         text = md.read_text(encoding="utf-8")
