@@ -7,7 +7,7 @@
   "plugins": [
     {
       "name": "okf",
-      "source": "./",
+      "source": "./skills",
       "description": "Agent skills for the Open Knowledge Format (OKF): write OKF bundles from sources the agent can read, and answer from bundles with provenance, trust, freshness, and attestation checks.",
       "version": "0.1.0",
       "author": {

@@ -16,7 +16,7 @@
     "metadata",
     "agent-skills"
   ],
-  "skills": "./skills/",
+  "skills": "./",
   "interface": {
     "displayName": "Open Knowledge Format",
     "shortDescription": "Write and read OKF knowledge bundles",
