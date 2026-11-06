@@ -38,8 +38,8 @@
 >   metrics with attested computations
 >   ([viz.html](bundles/acme_retail/viz.html))
 >
-> **Use OKF with other standards** — guides in [`usecases/`](usecases/)
-> show how OKF pairs with an existing standard. See [Use cases](#use-cases).
+> **Use OKF with other standards** — use cases show how OKF pairs with
+> an existing standard. See [Use cases](#use-cases).
 
 ## Why OKF?
 
@@ -109,13 +109,9 @@ Use cases are layered on the core spec, not part of it. A bundle that
 ignores them is still a conformant OKF bundle. When a convention proves
 itself across several use cases, it can be proposed for the core spec.
 
-Each use case has its own folder under [`usecases/`](usecases/), named
-`usecases/<usecase>/`. The guide is a `.md` file in that folder, and any
-sample bundles or artifacts sit next to it.
-
-- [`usecases/ossie/`](usecases/ossie/) — linking concepts to an
-  [Apache Ossie](https://github.com/apache/ossie) semantic model, so an
-  agent asks for a metric and dimensions instead of writing a query.
+Each use case has its own folder, named `usecases/<usecase>/`. The guide
+is a `.md` file in that folder, and any sample bundles or artifacts sit
+next to it.
 
 **Propose a use case.** If you pair OKF with a standard, open a pull
 request that adds a folder under `usecases/` with a `.md` file in it. A
