@@ -273,6 +273,15 @@ A tool without plugin support can load a skill from its skills directory. Copy
 a folder from `skills/` to `~/.agents/skills/` for the Codex IDE extension, or
 to `~/.gemini/config/skills/` for the Antigravity app and IDE.
 
+## Ecosystem
+
+Open-source tools built around OKF:
+
+- **[Knowledge Compiler](https://github.com/GoogleCloudPlatform/knowledge-compiler)**
+  — Apache-2.0 Agent Skills suite and local graph workbench that compiles
+  documents and coding-agent sessions into OKF v0.3 Markdown vaults with
+  validation, fact correction, and BM25 search.
+
 ## Tests
 
 ```
