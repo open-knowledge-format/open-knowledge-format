@@ -235,7 +235,11 @@ class Checker:
         root_index = self.bundle / "index.md"
         if not root_index.is_file():
             return None
-        state, meta, _, _ = split_frontmatter(root_index.read_text(encoding="utf-8").lstrip(BOM))
+        try:
+            text = root_index.read_text(encoding="utf-8").lstrip(BOM)
+        except UnicodeDecodeError:
+            return None
+        state, meta, _, _ = split_frontmatter(text)
         return meta.get("okf_version") if state == "ok" else None
 
     # ---- reporting ----------------------------------------------------------
@@ -265,7 +269,11 @@ class Checker:
             if not self.inside(path.resolve()):
                 continue  # Section 3.2: do not follow links out of the bundle root.
             self.files_checked += 1
-            text = path.read_text(encoding="utf-8").lstrip(BOM)
+            try:
+                text = path.read_text(encoding="utf-8").lstrip(BOM)
+            except UnicodeDecodeError:
+                self.error(path, None, "E008", "file is not valid UTF-8 (section 4)")
+                continue
             if path.name == "index.md":
                 self.check_index(path, text)
             elif path.name == "log.md":
