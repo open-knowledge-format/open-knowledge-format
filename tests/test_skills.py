@@ -284,6 +284,41 @@ def test_validate_rejects_a_missing_bundle(tmp_path: Path):
     assert _run(VALIDATE, str(tmp_path / "absent")).returncode == 2
 
 
+def test_validate_reports_non_utf8_markdown_and_continues(tmp_path: Path):
+    _write(tmp_path, "index.md", '---\nokf_version: "0.3"\n---\n\n# Bundle\n')
+    (tmp_path / "cafe.md").write_bytes(b"---\ntype: Reference\ntitle: Caf\xe9\n---\n\nBody.\n")
+    _write(tmp_path, "broken.md", "---\ntype: [unclosed\n---\n")
+
+    result = _run(VALIDATE, str(tmp_path), "--json")
+    assert result.returncode == 1
+    assert result.stderr == ""
+    data = json.loads(result.stdout)
+    assert data["files_checked"] == 3
+    cafe_findings = [f for f in data["findings"] if f["path"] == "cafe.md"]
+    assert len(cafe_findings) == 1
+    assert cafe_findings[0]["level"] == "error"
+    assert cafe_findings[0]["code"] == "E008"
+    assert cafe_findings[0]["line"] is None
+    assert any(f["path"] == "broken.md" and f["code"] == "E002" for f in data["findings"])
+
+
+def test_validate_reports_non_utf8_root_index_once(tmp_path: Path):
+    (tmp_path / "index.md").write_bytes(b'---\nokf_version: "0.3"\ntitle: Caf\xe9\n---\n')
+    _write(tmp_path, "fine.md", "---\ntype: Reference\ntitle: Fine\n---\n\nBody.\n")
+
+    result = _run(VALIDATE, str(tmp_path), "--json")
+    assert result.returncode == 1
+    assert result.stderr == ""
+    data = json.loads(result.stdout)
+    assert data["okf_version"] is None
+    assert data["files_checked"] == 2
+    e008_findings = [f for f in data["findings"] if f["code"] == "E008"]
+    assert len(e008_findings) == 1
+    assert e008_findings[0]["path"] == "index.md"
+    assert e008_findings[0]["level"] == "error"
+    assert e008_findings[0]["line"] is None
+
+
 # ---- scan.py (OKF v0.3) ------------------------------------------------------
 
 
